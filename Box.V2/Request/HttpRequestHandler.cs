@@ -18,6 +18,16 @@ namespace Box.V2.Request
         public const int RetryLimit = 5;
         private readonly TimeSpan _defaultRequestTimeout = new TimeSpan(0, 0, 100); // 100 seconds, same as default HttpClient timeout
         private readonly TimeSpan _timeout;
+        private IRetryStrategy _retryStrategy = new ExponentialBackoff();
+
+        public IRetryStrategy RetryStrategy
+        {
+            get => _retryStrategy;
+            set
+            {
+                _retryStrategy = value ?? new ExponentialBackoff();
+            }
+        }
 
         public HttpRequestHandler(IWebProxy webProxy = null, TimeSpan? timeout = null)
         {
@@ -62,7 +72,6 @@ namespace Box.V2.Request
             // Need to account for special cases when the return type is a stream
             var isStream = typeof(T) == typeof(Stream);
             var retryCounter = 0;
-            var expBackoff = new ExponentialBackoff();
             HttpResponseMessage response = null;
 
             try
@@ -98,7 +107,7 @@ namespace Box.V2.Request
                             && retryCounter++ < RetryLimit)
                         {
                             response?.Dispose();
-                            TimeSpan delay = expBackoff.GetRetryTimeout(retryCounter);
+                            TimeSpan delay = _retryStrategy.GetRetryTimeout(retryCounter);
 
                             Debug.WriteLine("HttpCode : {0}. Waiting for {1} seconds to retry request. RequestUri: {2}", response.StatusCode, delay.Seconds, httpRequest.RequestUri);
 
@@ -208,7 +217,7 @@ namespace Box.V2.Request
             {
                 Headers = response.Headers,
 
-                // Translate the status codes that interest us 
+                // Translate the status codes that interest us
                 StatusCode = response.StatusCode
             };
             switch (response.StatusCode)

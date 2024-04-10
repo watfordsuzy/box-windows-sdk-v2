@@ -28,7 +28,7 @@ namespace Box.V2.CCGAuth
         /// Constructor for CCG authentication with default boxService
         /// </summary>
         /// <param name="boxConfig">Config contains information about client id, client secret, enterprise id.</param>
-        public BoxCCGAuth(IBoxConfig boxConfig) : this(boxConfig, new BoxService(new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout)))
+        public BoxCCGAuth(IBoxConfig boxConfig) : this(boxConfig, new BoxService(new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout) { RetryStrategy = boxConfig.RetryStrategy }))
         {
 
         }

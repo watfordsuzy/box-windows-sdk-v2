@@ -10,7 +10,7 @@ using Box.V2.Services;
 namespace Box.V2
 {
     /// <summary>
-    /// The central entrypoint for all SDK interaction. The BoxClient houses all of the API endpoints and are represented 
+    /// The central entrypoint for all SDK interaction. The BoxClient houses all of the API endpoints and are represented
     /// as resource managers for each distinct endpoint
     /// </summary>
     public class BoxClient : IBoxClient
@@ -34,7 +34,10 @@ namespace Box.V2
             _asUser = asUser;
             _suppressNotifications = suppressNotifications;
 
-            _handler = new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout);
+            _handler = new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout)
+            {
+                RetryStrategy = boxConfig.RetryStrategy,
+            };
             _converter = new BoxJsonConverter();
             _service = new BoxService(_handler);
             Auth = new AuthRepository(Config, _service, _converter, null);
@@ -56,7 +59,10 @@ namespace Box.V2
             _asUser = asUser;
             _suppressNotifications = suppressNotifications;
 
-            _handler = new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout);
+            _handler = new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout)
+            {
+                RetryStrategy = boxConfig.RetryStrategy,
+            };
             _converter = new BoxJsonConverter();
             _service = new BoxService(_handler);
             Auth = new AuthRepository(Config, _service, _converter, authSession);
@@ -78,7 +84,10 @@ namespace Box.V2
             _asUser = asUser;
             _suppressNotifications = suppressNotifications;
 
-            _handler = new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout);
+            _handler = new HttpRequestHandler(boxConfig.WebProxy, boxConfig.Timeout)
+            {
+                RetryStrategy = boxConfig.RetryStrategy,
+            };
             _converter = new BoxJsonConverter();
             _service = new BoxService(_handler);
             Auth = authRepository;
